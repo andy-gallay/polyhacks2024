@@ -1,4 +1,27 @@
 import requests
+
+def premier_float_avant_non_entier(chaine):
+    partie_float_avant_non_entier = ""
+    decimal_trouve = False
+
+    for caractere in chaine:
+        if caractere.isdigit() or caractere == '.':
+            partie_float_avant_non_entier += caractere
+
+            if caractere == '.':
+                # Vérifier s'il y a déjà un point décimal dans la partie_float_avant_non_entier
+                if decimal_trouve:
+                    break  # Si oui, sortir de la boucle
+                else:
+                    decimal_trouve = True
+
+        elif partie_float_avant_non_entier:
+            break  # Sortir de la boucle dès qu'un non-entier est rencontré après la partie float
+
+    # Convertir la chaîne en un nombre à virgule flottante
+    nombre_float = partie_float_avant_non_entier
+
+    return nombre_float
 def valid_ing(meal_id,ing,mes):
     # URL de l'API
     url = f"https://www.themealdb.com/api/json/v1/1/lookup.php?i={meal_id}"
@@ -21,9 +44,15 @@ def valid_ing(meal_id,ing,mes):
                     measure_key = f"strMeasure{i}"
                     ingredient = meals[0].get(ingredient_key)
                     measure = meals[0].get(measure_key)
-                    print(measure)
-                    if ((ing.lower() in ingredient.lower()) and (int(measure[0:measure.find(" ")]))<=mes) :
-                        test = True
+                    if ingredient and measure:
+                        if "½" in measure:
+                            measure = measure.replace("½", "0.5")
+                        if (ing.lower() in ingredient.lower()) :
+                            if premier_float_avant_non_entier(measure) == "":
+                                test=True
+                                continue
+                            elif (float(premier_float_avant_non_entier(measure)))<=mes:
+                                test = True
     return test
 
 
