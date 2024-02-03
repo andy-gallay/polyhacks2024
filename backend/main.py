@@ -1,5 +1,16 @@
 import requests
+from collections import Counter
+def elements_plus_redondants(liste):
+    # Utiliser Counter pour compter les occurrences de chaque élément dans la liste
+    occurrences = Counter(liste)
 
+    # Trouver le nombre maximum d'occurrences
+    max_occurrences = max(occurrences.values())
+
+    # Filtrer les éléments ayant le nombre maximum d'occurrences
+    redondants = [element for element, occurrence in occurrences.items() if occurrence == max_occurrences]
+
+    return redondants
 def premier_float_avant_non_entier(chaine):
     partie_float_avant_non_entier = ""
     decimal_trouve = False
@@ -33,7 +44,7 @@ def valid_ing(meal_id,ing,mes):
     if response.status_code == 200:
         # Extraire les données JSON de la réponse
         data = response.json()
-
+        nbing=0
         # Extraire les détails de la recette de la réponse
         meals = data.get("meals", [])
         if meals:
@@ -45,6 +56,7 @@ def valid_ing(meal_id,ing,mes):
                     ingredient = meals[0].get(ingredient_key)
                     measure = meals[0].get(measure_key)
                     if ingredient and measure:
+                        nbing+=1
                         if "½" in measure:
                             measure = measure.replace("½", "0.5")
                         if (ing.lower() in ingredient.lower()) :
@@ -53,7 +65,7 @@ def valid_ing(meal_id,ing,mes):
                                 continue
                             elif (float(premier_float_avant_non_entier(measure)))<=mes:
                                 test = True
-    return test
+    return test,nbing
 
 
 def search_recipes_by_ingredients(ingredients,measures):
@@ -80,9 +92,9 @@ def search_recipes_by_ingredients(ingredients,measures):
             meals = data.get("meals", [])
             for meal in meals:
                 meal_id = meal.get("idMeal")
-                if meal_id and valid_ing(meal_id,ingredient,measures[i]) :
-                    meal_ids.append(meal_id)
-                    print(meal_ids)
+                if valid_ing(meal_id,ingredient,measures[i])[1]<12:
+                    if meal_id and valid_ing(meal_id,ingredient,measures[i])[0] :
+                        meal_ids.append(meal_id)
     i+=1
     return meal_ids
 
@@ -92,8 +104,7 @@ measures=[1,2,3]
 
 # Rechercher les recettes par ingrédients
 result = search_recipes_by_ingredients(ingredients,measures)
+print(result)
+print(elements_plus_redondants(result))
 
-
-# Afficher les identifiants de recettes trouvées
-print("Identifiants de recettes trouvées:", result)
 
