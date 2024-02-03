@@ -1,24 +1,33 @@
-import React from 'react';
+import React, {useState} from 'react';
 import logo from './logo.svg';
+import emf_logo from './img/petites_recettes_black_font_logo.png'
 import './App.css';
+import Navbar from './components/Navbar/Navbar';
+import IngredientsPicker from './components/IngredientsPicker/IngredientsPicker';
+import RecipeFinder from './components/RecipeFinder/RecipeFinder';
+
+interface Ingredient {
+  name: string,
+  quantity: number
+}
 
 function App() {
+
+  const [ingredients, setIngredients] = useState<Ingredient[]>([])
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Navbar></Navbar>
+      <div className='main-content'>
+        <span className="IngredientsPicker">
+          <IngredientsPicker></IngredientsPicker>
+        </span>
+        
+        <span className="RecipeFinder">
+          <RecipeFinder></RecipeFinder>
+        </span>
+      </div>
+      
     </div>
   );
 }
