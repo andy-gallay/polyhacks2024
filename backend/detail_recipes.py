@@ -1,5 +1,5 @@
 import requests
-def get_recipe_by_id(meal_id):
+def valid_ing(meal_id,ing,mes):
     # URL de l'API
     url = f"https://www.themealdb.com/api/json/v1/1/lookup.php?i={meal_id}"
 
@@ -14,32 +14,21 @@ def get_recipe_by_id(meal_id):
         # Extraire les détails de la recette de la réponse
         meals = data.get("meals", [])
         if meals:
-            return meals[0]
+            if meals[0]:
+                test=False
+                for i in range(1, 21):
+                    ingredient_key = f"strIngredient{i}"
+                    measure_key = f"strMeasure{i}"
+                    ingredient = meals[0].get(ingredient_key)
+                    measure = meals[0].get(measure_key)
+                    if ((ing.lower() in ingredient.lower()) and (int(measure[0:measure.find(" ")]))<=mes) :
+                        test = True
+    return test
 
-    return None
 
 # ID de la recette
 meal_id = "52940"
 
 # Obtenir les détails de la recette par ID
-recipe = get_recipe_by_id(meal_id)
-
+print(valid_ing(meal_id,"onion",2))
 # Afficher les détails de la recette
-if recipe:
-    print("Détails de la recette:")
-    print("Nom:", recipe["strMeal"])
-    print("Catégorie:", recipe["strCategory"])
-    print("Région:", recipe["strArea"])
-    print("Instructions:", recipe["strInstructions"])
-    print("Ingrédients:")
-    for i in range(1, 21):
-        ingredient_key = f"strIngredient{i}"
-        measure_key = f"strMeasure{i}"
-        ingredient = recipe.get(ingredient_key)
-        measure = recipe.get(measure_key)
-        if ingredient and measure:
-            print(f"- {measure.strip()} {ingredient.strip()}")
-    print("Image de la recette:", recipe["strMealThumb"])
-    print("Source:", recipe["strSource"])
-else:
-    print("Aucune recette trouvée avec cet ID.")
