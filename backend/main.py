@@ -82,7 +82,7 @@ def search_recipes_by_ingredients(ingredients,measures):
                 meal_id = meal.get("idMeal")
                 if meal_id and valid_ing(meal_id,ingredient,measures[i]) :
                     meal_ids.append(meal_id)
-                    print(meal_ids)
+                    
     i+=1
     return meal_ids
 
