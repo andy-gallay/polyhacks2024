@@ -1,13 +1,40 @@
 import requests
 from collections import Counter
+
+def get_recipe_by_id(meal_id):
+    # URL de l'API
+    url = f"https://www.themealdb.com/api/json/v1/1/lookup.php?i={meal_id}"
+    # Faire la requête GET
+    response = requests.get(url)
+    # Vérifier si la requête a réussi
+    if response.status_code == 200:
+        # Extraire les données JSON de la réponse
+        data = response.json()
+        # Extraire les détails de la recette de la réponse
+        meals = data.get("meals", [])
+        if meals:
+            if meals[0]:
+                recipe_details = {
+                    "Nom": meals[0]["strMeal"],
+                    "Catégorie": meals[0]["strCategory"],
+                    "Région": meals[0]["strArea"],
+                    "Instructions": meals[0]["strInstructions"],
+                    "Ingrédients": []
+                }
+                for i in range(1, 21):
+                    ingredient_key = f"strIngredient{i}"
+                    measure_key = f"strMeasure{i}"
+                    ingredient = meals[0].get(ingredient_key)
+                    measure = meals[0].get(measure_key)
+                    if ingredient and measure:
+                        recipe_details["Ingrédients"].append(f"- {measure.strip()} {ingredient.strip()}")
+                recipe_details["Image de la recette"] = meals[0]["strMealThumb"]
+                recipe_details["Source"] = meals[0]["strSource"]
+                return recipe_details
+    return None
 def elements_plus_redondants(liste):
-    # Utiliser Counter pour compter les occurrences de chaque élément dans la liste
     occurrences = Counter(liste)
-
-    # Trouver le nombre maximum d'occurrences
     max_occurrences = max(occurrences.values())
-
-    # Filtrer les éléments ayant le nombre maximum d'occurrences
     redondants = [element for element, occurrence in occurrences.items() if occurrence == max_occurrences]
 
     return redondants
@@ -67,7 +94,6 @@ def valid_ing(meal_id,ing,mes):
                                 test = True
     return test,nbing
 
-
 def search_recipes_by_ingredients(ingredients,measures):
     # Base URL de l'API
     base_url = "https://www.themealdb.com/api/json/v1/1/filter.php"
@@ -79,32 +105,29 @@ def search_recipes_by_ingredients(ingredients,measures):
     for ingredient in ingredients:
         # Paramètres de la requête
         params = {"i": ingredient}
-
         # Faire la requête GET
         response = requests.get(base_url, params=params)
-
         # Vérifier si la requête a réussi
         if response.status_code == 200:
-            # Extraire les données JSON de la réponse
             data = response.json()
-
-            # Extraire les identifiants de recettes de la réponse
             meals = data.get("meals", [])
             for meal in meals:
                 meal_id = meal.get("idMeal")
-                if valid_ing(meal_id,ingredient,measures[i])[1]<12:
-                    if meal_id and valid_ing(meal_id,ingredient,measures[i])[0] :
-                        meal_ids.append(meal_id)
-    i+=1
+                if meal_id and valid_ing(meal_id,ingredient,measures[i])[0] :
+                    meal_ids.append(meal_id)
+                    print(meal_id)
+                    if len(meal_ids) >= 30:
+                        break
+        i+=1
     return meal_ids
 
-# Ingrédients de recherche
-ingredients = ["chicken", "onion", "broccoli"]
-measures=[1,2,3]
-
-# Rechercher les recettes par ingrédients
+# Ingrédients et mesures de recherche
+ingredients = ["chicken", "onion", "garlic", "tomato"]
+measures=[1,2,3,2]
 result = search_recipes_by_ingredients(ingredients,measures)
-print(result)
-print(elements_plus_redondants(result))
+list=[]
+for i in elements_plus_redondants(result):
+    list.append(get_recipe_by_id(i))
+print(list)
 
 
