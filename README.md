@@ -10,7 +10,7 @@ Ce projet vise à contribuer au développement durable en abordant le problème 
 
 ### Backend
 
-Le backend du projet est implémenté en Python et utilise l'[API TheMealDB](https://www.themealdb.com/api.php) pour récupérer les informations sur les recettes.
+Le backend du projet est implémenté en Python avec une API qui est construite à partir de la base de données [TheMealDB](https://www.themealdb.com/api.php) pour récupérer les informations nécessaires sur les recettes.
 
 #### Principales fonctionnalités :
 
